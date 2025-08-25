@@ -1,0 +1,58 @@
+package lutfiangg20.demo_teknis.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import lutfiangg20.demo_teknis.entity.RefreshToken;
+import lutfiangg20.demo_teknis.model.LoginUserRequest;
+import lutfiangg20.demo_teknis.model.TokenResponse;
+import lutfiangg20.demo_teknis.repository.RefreshTokenRepository;
+import lutfiangg20.demo_teknis.repository.UserRepository;
+
+@Service
+public class AuthService {
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
+  private RefreshTokenRepository refreshTokenRepository;
+
+  @Autowired
+  private ValidationService validationService;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private JwtService jwtService;
+
+  public TokenResponse login(
+      LoginUserRequest request,
+      String userAgent) {
+    validationService.validate(request);
+
+    var user = userRepository.findByEmail(request.getEmail())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email or password wrong"));
+
+    if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      var refreshToken = new RefreshToken();
+      refreshToken.setToken(jwtService.generateRefreshToken(user));
+      refreshToken.setUserID(user.getId());
+      refreshToken.setUserAgent(userAgent);
+      refreshToken.setExpiresAt(jwtService.REFRESH_TOKEN_EXPIRATION);
+      refreshTokenRepository.save(refreshToken);
+
+      var accessTokenString = jwtService.generateAccessToken(user);
+      return TokenResponse
+          .builder()
+          .accessToken(accessTokenString)
+          .expiredAt(jwtService.ACCESS_TOKEN_EXPIRATION).build();
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email or password wrong");
+    }
+  }
+
+}

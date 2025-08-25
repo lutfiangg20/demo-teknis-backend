@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_demo-teknis
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-demo-teknis:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: adminer_demo-teknis
+    restart: unless-stopped
+    ports:
+      - 4001:8080
+
+volumes:
+  postgres-demo-teknis:
