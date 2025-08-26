@@ -7,9 +7,13 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lutfiangg20.demo_teknis.entity.User;
+import lutfiangg20.demo_teknis.model.JwtPayload;
 
 @Service
 public class JwtService {
@@ -24,6 +28,7 @@ public class JwtService {
         .builder()
         .setSubject(user.getEmail())
         .claim("role", "admin")
+        .claim("userId", user.getId())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
         .signWith(key)
@@ -34,10 +39,47 @@ public class JwtService {
     return Jwts
         .builder()
         .setSubject(user.getEmail())
-        .claim("role", "admin")
+        .claim("role", "user")
+        .claim("userId", user.getId())
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
         .signWith(key)
         .compact();
+  }
+
+  public Claims validate(String token) {
+    try {
+
+      return Jwts
+          .parserBuilder()
+          .setSigningKey(key)
+          .build()
+          .parseClaimsJws(token)
+          .getBody();
+    } catch (JwtException | IllegalArgumentException e) {
+      return null;
+    }
+
+  }
+
+  public JwtPayload decodePayload(String token) {
+    var claims = Jwts.claims();
+    try {
+      claims = Jwts
+          .parserBuilder()
+          .setSigningKey(key)
+          .build()
+          .parseClaimsJws(token)
+          .getBody();
+
+    } catch (ExpiredJwtException e) {
+      claims = e.getClaims();
+    }
+
+    var newPayload = new JwtPayload();
+    newPayload.setEmail(claims.get("email", String.class));
+    newPayload.setRole(claims.get("role", String.class));
+    newPayload.setUserId(((Number) claims.get("userId")).intValue());
+    return newPayload;
   }
 }

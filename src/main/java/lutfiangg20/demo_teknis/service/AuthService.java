@@ -40,7 +40,7 @@ public class AuthService {
     if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       var refreshToken = new RefreshToken();
       refreshToken.setToken(jwtService.generateRefreshToken(user));
-      refreshToken.setUserID(user.getId());
+      refreshToken.setUserId(user.getId());
       refreshToken.setUserAgent(userAgent);
       refreshToken.setExpiresAt(jwtService.REFRESH_TOKEN_EXPIRATION);
       refreshTokenRepository.save(refreshToken);
@@ -53,6 +53,17 @@ public class AuthService {
     } else {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email or password wrong");
     }
+  }
+
+  public String logout(String token, String userAgent) {
+    var payload = jwtService.decodePayload(token);
+    var userID = payload.getUserId();
+    var refreshTokens = refreshTokenRepository.findByUserIdAndUserAgent(userID, userAgent);
+    if (refreshTokens.size() > 0) {
+      refreshTokenRepository.deleteAll(refreshTokens);
+      return "You're logged out";
+    }
+    return "no refresh token found";
   }
 
 }
