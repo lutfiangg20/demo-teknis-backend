@@ -66,4 +66,16 @@ public class AuthService {
     return "no refresh token found";
   }
 
+  public String refresh(String token, String userAgent) {
+    var payload = jwtService.decodePayload(token);
+    var userID = payload.getUserId();
+    var refreshTokens = refreshTokenRepository.findByUserIdAndUserAgent(userID, userAgent);
+    System.out.println("refreshTokens: " + refreshTokens);
+    if (refreshTokens.size() > 0) {
+      var accessTokenString = jwtService.generateAccessToken(userRepository.findById(userID).get());
+      return accessTokenString;
+    }
+    return "no refresh token found";
+  }
+
 }

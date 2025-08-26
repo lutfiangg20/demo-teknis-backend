@@ -36,6 +36,14 @@ public class AuthController {
 
   }
 
+  @GetMapping("refresh")
+  public WebResponse<String> refresh(
+      @RequestHeader("Authorization") String bearerToken,
+      @RequestHeader(value = "User-Agent", required = false) String userAgent) {
+    var token = bearerToken.replace("Bearer ", "");
+    return WebResponse.<String>builder().data(authService.refresh(token, userAgent)).build();
+  }
+
   @GetMapping("check")
   public WebResponse<String> check() {
     return WebResponse.<String>builder().data("You're logged in").build();

@@ -1,5 +1,8 @@
 package lutfiangg20.demo_teknis.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.transaction.Transactional;
 import lutfiangg20.demo_teknis.entity.User;
+import lutfiangg20.demo_teknis.entity.UserProfile;
 import lutfiangg20.demo_teknis.model.RegisterUserRequest;
+import lutfiangg20.demo_teknis.model.UpdateUserProfileRequest;
 import lutfiangg20.demo_teknis.model.UserResponse;
 import lutfiangg20.demo_teknis.model.UserWithProfileResponse;
 import lutfiangg20.demo_teknis.repository.UserRepository;
@@ -65,7 +70,48 @@ public class UserService {
         user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "",
         user.getAddress(),
         user.getBio());
+  }
 
+  @Transactional
+  public String updateUserProfile(int id, UpdateUserProfileRequest request) {
+    User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (request.getName() != null && !request.getName().isBlank()) {
+      user.setName(request.getName().trim());
+    }
+
+    UserProfile profile = user.getProfile();
+    if (profile == null) {
+      profile = new UserProfile();
+      profile.setUser(user);
+    }
+
+    // update field profile hanya kalau ada datanya
+    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+      profile.setPhoneNumber(request.getPhoneNumber().trim());
+    }
+
+    if (request.getAddress() != null && !request.getAddress().isBlank()) {
+      profile.setAddress(request.getAddress().trim());
+    }
+
+    if (request.getBio() != null && !request.getBio().isBlank()) {
+      profile.setBio(request.getBio().trim());
+    }
+
+    if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank()) {
+      try {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        profile.setDateOfBirth(LocalDate.parse(request.getDateOfBirth(), formatter));
+      } catch (DateTimeParseException e) {
+        throw new RuntimeException("Invalid date format, expected yyyy-MM-dd");
+      }
+    }
+
+    user.setProfile(profile);
+    userRepository.save(user);
+
+    return "User profile updated successfully";
   }
 
   public String deleteUserById(int id) {
