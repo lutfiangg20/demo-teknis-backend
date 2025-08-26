@@ -1,0 +1,12 @@
+
+CREATE TABLE user_profiles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  phone_number VARCHAR(50) DEFAULT '',
+  date_of_birth DATE,
+  address TEXT DEFAULT '',
+  bio TEXT DEFAULT '',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);

@@ -49,7 +49,6 @@ public class JwtService {
 
   public Claims validate(String token) {
     try {
-
       return Jwts
           .parserBuilder()
           .setSigningKey(key)

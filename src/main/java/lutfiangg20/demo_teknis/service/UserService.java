@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lutfiangg20.demo_teknis.entity.User;
 import lutfiangg20.demo_teknis.model.RegisterUserRequest;
 import lutfiangg20.demo_teknis.model.UserResponse;
+import lutfiangg20.demo_teknis.model.UserWithProfileResponse;
 import lutfiangg20.demo_teknis.repository.UserRepository;
 
 @Service
@@ -46,14 +47,34 @@ public class UserService {
     return userRepository.findAllUserWihtoutPassword();
   }
 
-  public UserResponse getUserById(int id) {
-    var user = userRepository.findById(id);
+  public UserWithProfileResponse getUserById(int id) {
+    var userOptional = userRepository.findUserWithProfile(id);
+    System.out.println("get user by id" + userOptional);
 
-    if (user.isEmpty()) {
+    if (userOptional.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
     }
 
-    return new UserResponse(user.get().getId(), user.get().getName(), user.get().getEmail());
+    var user = userOptional.get();
+
+    return new UserWithProfileResponse(
+        user.getId(),
+        user.getName(),
+        user.getEmail(),
+        user.getPhoneNumber(),
+        user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "",
+        user.getAddress(),
+        user.getBio());
+
+  }
+
+  public String deleteUserById(int id) {
+    if (userRepository.existsById(id)) {
+      userRepository.deleteById(id);
+      return "User deleted successfully";
+    } else {
+      return "user not found";
+    }
   }
 
 }
