@@ -18,6 +18,7 @@ import lutfiangg20.demo_teknis.model.JwtPayload;
 @Service
 public class JwtService {
   private final String SECRET_KEY = "iniSecretSuperRahasia1234567890!@#$1234";
+  private final String ISS = "user-client-key";
   public final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7;
   public final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60;
   private final SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8),
@@ -27,6 +28,7 @@ public class JwtService {
     return Jwts
         .builder()
         .setSubject(user.getEmail())
+        .setIssuer(ISS)
         .claim("role", "admin")
         .claim("userId", user.getId())
         .setIssuedAt(new Date())
@@ -39,6 +41,7 @@ public class JwtService {
     return Jwts
         .builder()
         .setSubject(user.getEmail())
+        .setIssuer(ISS)
         .claim("role", "user")
         .claim("userId", user.getId())
         .setIssuedAt(new Date())

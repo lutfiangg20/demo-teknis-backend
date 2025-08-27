@@ -1,4 +1,12 @@
 services:
+  backend:
+    build: .
+    # ports:
+    #   - "3000:3000"
+    networks:
+      - kong-net
+      - default
+
   postgres:
     image: postgres:17
     container_name: postgres_demo-teknis
@@ -21,3 +29,7 @@ services:
 
 volumes:
   postgres-demo-teknis:
+
+networks:
+  kong-net:
+    external: true
