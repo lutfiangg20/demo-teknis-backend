@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,8 +50,12 @@ public class UserService {
     userRepository.save(user);
   }
 
-  public List<UserResponse> getAllUsers() {
-    return userRepository.findAllUserWihtoutPassword();
+  public Page<UserResponse> getAllUsers(Pageable pageable) {
+    return userRepository.findAllUserWihtoutPassword(pageable);
+  }
+
+  public Page<UserResponse> searchUsers(String keyword, Pageable pageable) {
+    return userRepository.searchUserWihtoutPassword(keyword, pageable);
   }
 
   public UserWithProfileResponse getUserById(int id) {
