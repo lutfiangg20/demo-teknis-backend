@@ -6,6 +6,8 @@ services:
     networks:
       - kong-net
       - default
+    command: >
+      sh -c "./mvnw flyway:migrate && java -jar app.jar"
 
   postgres:
     image: postgres:17
