@@ -1,6 +1,8 @@
 services:
   backend:
     build: .
+    ports:
+      - "3000:3000"
     networks:
       - kong-net
       - default
