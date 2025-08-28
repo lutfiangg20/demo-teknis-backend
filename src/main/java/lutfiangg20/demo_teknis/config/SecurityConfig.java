@@ -31,12 +31,12 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .formLogin(form -> form.disable())
         .httpBasic(basic -> basic.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers("/api/users/**").authenticated()
-            .requestMatchers("/api/auth/check").authenticated()
-            .anyRequest().permitAll())
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        // .authorizeHttpRequests(auth -> auth
+        // .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+        // .requestMatchers("/api/users/**").authenticated()
+        // .requestMatchers("/api/auth/check").authenticated()
+        // .anyRequest().permitAll())
+        // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint())
             .accessDeniedHandler(accessDeniedHandler()));
 
