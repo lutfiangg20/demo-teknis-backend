@@ -40,6 +40,11 @@ public class UserController {
     return WebResponse.<Page<UserResponse>>builder().data(userService.getAllUsers(pageable)).build();
   }
 
+  @GetMapping("/test")
+  public WebResponse<String> test(){
+    return WebResponse.<String>builder().data("test route").build();
+  }
+
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public WebResponse<UserWithProfileResponse> getUserById(@PathVariable int id) {
     return WebResponse.<UserWithProfileResponse>builder().data(userService.getUserById(id)).build();
