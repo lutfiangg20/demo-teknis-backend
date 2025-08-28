@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - postgres-demo-teknis:/var/lib/postgresql/data
+      - demo-backend_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
     restart: unless-stopped
